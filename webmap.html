@@ -6,6 +6,8 @@
   <link rel="stylesheet" href="leaflet-side-by-side-gh-pages/layout.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="leaflet-side-by-side-gh-pages/leaflet-side-by-side.js"></script>
+  <script src="leaflet.ajax.min.js"></script>
+
   <style>
     #map {position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
   </style>
@@ -16,17 +18,33 @@
 <body>
   <div id = "map"></div>
   <script>
-
+    
     var map = L.map('map').setView([-3.442459, -62.205882], 5);
-    var layer1 = L.tileLayer('https://api.maptiler.com/maps/backdrop/{z}/{x}/{y}.png?key=uLj1tcTeRnTuMXmIJzxd', {
-      attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>', 
-    }).addTo(map);
-    var layer2 = L.tileLayer('https://api.maptiler.com/maps/backdrop/{z}/{x}/{y}.png?key=uLj1tcTeRnTuMXmIJzxd', {
+    map.createPane('left');
+    map.createPane('right');
+
+    var basemap = L.tileLayer('https://api.maptiler.com/maps/backdrop/{z}/{x}/{y}.png?key=uLj1tcTeRnTuMXmIJzxd', {
       attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>', 
     }).addTo(map);
 
-    L.control.sideBySide(layer1, layer2).addTo(map);
+    prodeslyr = L.geoJSON.ajax('PRODES_deforestation.geojson',{ 
+      style: {color: 'orange'}
+    }).addTo(map);
+    car2023 = L.geoJSON.ajax('CAR_2023.geojson',{ 
+      style: {color: 'green', 
+      pane: 'left'}
+    }).addTo(map);
+    car2024 = L.geoJSON.ajax('CAR_2024.geojson',{ 
+      style: {color: 'blue',
+      pane: 'right'}
+    }).addTo(map);
+
+    L.control.sideBySide(car2024, car2023).addTo(map);
+
 
   </script>
 </body>
 </html>
+
+
+

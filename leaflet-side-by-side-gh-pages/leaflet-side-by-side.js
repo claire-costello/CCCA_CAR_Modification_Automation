@@ -49,6 +49,14 @@ function asArray (arg) {
 
 function noop () {}
 
+// start fix for Leaflet 1.9 -----------------------
+function isTouch() {
+  return (('ontouchstart' in window)
+      || (navigator.MaxTouchPoints > 0)
+      || (navigator.msMaxTouchPoints > 0));    
+}
+// end fix for Leaflet 1.9 -----------------------
+
 L.Control.SideBySide = L.Control.extend({
   options: {
     thumbSize: 42,
@@ -95,10 +103,16 @@ L.Control.SideBySide = L.Control.extend({
       return this
     }
     if (this._leftLayer) {
-      this._leftLayer.getContainer().style.clip = ''
+// start fix for Leaflet 1.9 -----------------------
+//      this._leftLayer.getContainer().style.clip = ''
+      this._leftLayer.getPane().style.clip = ''
+// end fix for Leaflet 1.9 -----------------------
     }
     if (this._rightLayer) {
-      this._rightLayer.getContainer().style.clip = ''
+// start fix for Leaflet 1.9 -----------------------
+//      this._rightLayer.getContainer().style.clip = ''
+      this._rightLayer.getPane().style.clip = ''
+// end fix for Leaflet 1.9 -----------------------
     }
     this._removeEvents()
     L.DomUtil.remove(this._container)
@@ -128,15 +142,19 @@ L.Control.SideBySide = L.Control.extend({
     var dividerX = this.getPosition()
 
     this._divider.style.left = dividerX + 'px'
-    this._divider.offsetHeight;  
     this.fire('dividermove', {x: dividerX})
     var clipLeft = 'rect(' + [nw.y, clipX, se.y, nw.x].join('px,') + 'px)'
     var clipRight = 'rect(' + [nw.y, se.x, se.y, clipX].join('px,') + 'px)'
     if (this._leftLayer) {
-      this._leftLayer.getContainer().style.clip = clipLeft
+// start fix for Leaflet 1.9 -----------------------
+//      this._leftLayer.getContainer().style.clip = clipLeft
+      this._leftLayer.getPane().style.clip = clipLeft
     }
     if (this._rightLayer) {
-      this._rightLayer.getContainer().style.clip = clipRight
+// start fix for Leaflet 1.9 -----------------------
+//      this._rightLayer.getContainer().style.clip = clipRight
+      this._rightLayer.getPane().style.clip = clipRight
+// end fix for Leaflet 1.9 -----------------------
     }
   },
 
@@ -174,9 +192,13 @@ L.Control.SideBySide = L.Control.extend({
     if (!map || !range) return
     map.on('move', this._updateClip, this)
     map.on('layeradd layerremove', this._updateLayers, this)
-    on(range, 'input change', this._updateClip, this);
-    on(range, 'mousedown touchstart', cancelMapDrag, this);
-    on(range, 'mouseup touchend', uncancelMapDrag, this);    
+    on(range, getRangeEvent(range), this._updateClip, this)
+// start fix for Leaflet 1.9 -----------------------
+//    on(range, L.Browser.touch ? 'touchstart' : 'mousedown', cancelMapDrag, this)
+//    on(range, L.Browser.touch ? 'touchend' : 'mouseup', uncancelMapDrag, this)
+    on(range, isTouch() ? 'touchstart' : 'mousedown', cancelMapDrag, this)
+    on(range, isTouch() ? 'touchend' : 'mouseup', uncancelMapDrag, this)
+// end fix for Leaflet 1.9 -----------------------
   },
 
   _removeEvents: function () {
@@ -184,8 +206,8 @@ L.Control.SideBySide = L.Control.extend({
     var map = this._map
     if (range) {
       off(range, getRangeEvent(range), this._updateClip, this)
-      on(range, 'mousedown touchstart', cancelMapDrag, this);
-      on(range, 'mouseup touchend', uncancelMapDrag, this);
+      off(range, L.Browser.touch ? 'touchstart' : 'mousedown', cancelMapDrag, this)
+      off(range, L.Browser.touch ? 'touchend' : 'mouseup', uncancelMapDrag, this)
     }
     if (map) {
       map.off('layeradd layerremove', this._updateLayers, this)
