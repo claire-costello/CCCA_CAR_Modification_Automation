@@ -158,34 +158,33 @@ L.Control.SideBySide = L.Control.extend({
     }
   },
 
-  _updateClip: function () {
-    var map = this._map;
-    var nw = map.containerPointToLayerPoint([0, 0]); // Northwest corner of the map
-    var se = map.containerPointToLayerPoint(map.getSize()); // Southeast corner of the map
-    var clipX = nw.x + this.getPosition(); // Position of the divider
-    var dividerX = this.getPosition(); // The X position of the slider
-
-    this._divider.style.left = dividerX + 'px';
-    this.fire('dividermove', {x: dividerX});
-
-    // Define the clip paths for both layers:
-    // For the left layer 
-    var clipLeft = 'rect(' + [nw.y, clipX, se.y, nw.x].join('px,') + 'px)';
-    // For the right layer 
-    var clipRight = 'rect(' + [nw.y, se.x, se.y, clipX].join('px,') + 'px)';
-
-    // Apply the clip effect to the left layer 
-    if (this._leftLayer) {
-        this._leftLayer.getPane().style.clip = clipLeft; // Clip the left layer
+  _updateLayers: function () {
+    if (!this._map) {
+      return this
     }
-
-    // Apply the clip effect to the right layer
-    if (this._rightLayer) {
-        var inverseClipRight = 'rect(' + [nw.y, clipX, se.y, se.x].join('px,') + 'px)';
-        this._rightLayer.getPane().style.clip = inverseClipRight; // Clip the right layer
+    var prevLeft = this._leftLayer
+    var prevRight = this._rightLayer
+    this._leftLayer = this._rightLayer = null
+    this._leftLayers.forEach(function (layer) {
+      if (this._map.hasLayer(layer)) {
+        this._leftLayer = layer
+      }
+    }, this)
+    this._rightLayers.forEach(function (layer) {
+      if (this._map.hasLayer(layer)) {
+        this._rightLayer = layer
+      }
+    }, this)
+    if (prevLeft !== this._leftLayer) {
+      prevLeft && this.fire('leftlayerremove', {layer: prevLeft})
+      this._leftLayer && this.fire('leftlayeradd', {layer: this._leftLayer})
     }
-},
-
+    if (prevRight !== this._rightLayer) {
+      prevRight && this.fire('rightlayerremove', {layer: prevRight})
+      this._rightLayer && this.fire('rightlayeradd', {layer: this._rightLayer})
+    }
+    this._updateClip()
+  },
 
   _addEvents: function () {
     var range = this._range
