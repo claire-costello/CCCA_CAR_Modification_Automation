@@ -6,14 +6,14 @@
   <link rel="stylesheet" href="leaflet-side-by-side-gh-pages/layout.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="leaflet-side-by-side-gh-pages/leaflet-side-by-side.js"></script>
-  <script src="leaflet.ajax.min.js"></script>
+  <script src="leaflet-side-by-side-gh-pages/leaflet.ajax.min.js"></script>
 
   <style>
     #map {position: absolute; top: 0; bottom: 0; left: 0; right: 0;}
   </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>CCCA Webmap Draft</title>
 </head>
 <body>
   <div id = "map"></div>
@@ -25,16 +25,16 @@
     var basemap = L.tileLayer('https://api.maptiler.com/maps/backdrop/{z}/{x}/{y}.png?key=uLj1tcTeRnTuMXmIJzxd', {
       attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>', 
     }).addTo(map);
-    var prodes = L.geoJSON.ajax('PRODES_deforestation.geojson', {style: {color:'orange'}}).addTo(map);
+    var prodes = L.geoJSON.ajax('data/PRODES_deforestation.geojson', {style: {color:'orange'}}).addTo(map);
 
     // Assign car2023 data to the left pane
-    var car2023 = L.geoJSON.ajax('CAR_2023.geojson', { 
+    var car2023 = L.geoJSON.ajax('data/CAR_2023.geojson', { 
       style: {color: 'grey'},
       pane: 'left'
     }).addTo(map);
 
     // Assign car2024 data to the right pane
-    var car2024 = L.geoJSON.ajax('CAR_2024.geojson', { 
+    var car2024 = L.geoJSON.ajax('data/CAR_2024.geojson', { 
       style: {color: 'blue'},
       pane: 'right' 
     }).addTo(map);
